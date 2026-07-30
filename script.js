@@ -53,6 +53,10 @@ const translations = {
     labelProductPrice: "ราคา (กีบ)",
     labelProductImage: "รูปภาพสินค้า",
     imageHelperText: "เพิ่มได้หลายรูป เลือกไฟล์หรือถ่ายจากกล้องมือถือได้",
+    addImageBtn: "เพิ่มรูปภาพ",
+    actionCamera: "ถ่ายภาพใหม่",
+    actionGallery: "เลือกจากคลังภาพ",
+    actionCancel: "ยกเลิก",
     placeholderProductName: "เช่น RAM DDR4 16GB",
     placeholderProductDesc: "รายละเอียด สเปค หรือหมายเหตุเพิ่มเติม",
     cancelButton: "ยกเลิก",
@@ -87,6 +91,8 @@ const translations = {
     sortPriceDesc: "ราคา: มาก → น้อย",
     sortNameAsc: "ชื่อ: ก → ฮ",
     deleteButton: "ลบ",
+    backButton: "กลับ",
+    notFoundText: "ไม่พบสินค้านี้ อาจถูกลบไปแล้ว",
   },
   en: {
     pageTitle: "CompStock Manager - Product Inventory",
@@ -102,6 +108,10 @@ const translations = {
     labelProductPrice: "Price (KIP)",
     labelProductImage: "Product Image",
     imageHelperText: "Add multiple photos. Use your camera or choose files.",
+    addImageBtn: "Add Photo",
+    actionCamera: "Take a New Photo",
+    actionGallery: "Choose from Library",
+    actionCancel: "Cancel",
     placeholderProductName: "e.g. RAM DDR4 16GB",
     placeholderProductDesc: "Specifications, notes or additional details",
     cancelButton: "Cancel",
@@ -136,6 +146,8 @@ const translations = {
     sortPriceDesc: "Price: High to Low",
     sortNameAsc: "Name: A to Z",
     deleteButton: "Delete",
+    backButton: "Back",
+    notFoundText: "Product not found. It may have been deleted.",
   },
   zh: {
     pageTitle: "CompStock Manager - 产品库存",
@@ -151,6 +163,10 @@ const translations = {
     labelProductPrice: "价格 (基普)",
     labelProductImage: "产品图片",
     imageHelperText: "可添加多张图片，使用手机摄像头或选择本地图片。",
+    addImageBtn: "添加图片",
+    actionCamera: "拍摄新照片",
+    actionGallery: "从相册选择",
+    actionCancel: "取消",
     placeholderProductName: "例如 RAM DDR4 16GB",
     placeholderProductDesc: "规格、备注或其他说明",
     cancelButton: "取消",
@@ -185,6 +201,8 @@ const translations = {
     sortPriceDesc: "价格：高到低",
     sortNameAsc: "名称：A到Z",
     deleteButton: "删除",
+    backButton: "返回",
+    notFoundText: "未找到该商品，可能已被删除",
   },
 };
 
@@ -192,14 +210,15 @@ const translations = {
 const productGrid = document.getElementById("productGrid");
 const searchInput = document.getElementById("searchInput");
 const productCount = document.getElementById("productCount");
-const languageSelect = document.getElementById("languageSelect");
+const currentLangFlag = document.getElementById("currentLangFlag");
+const currentLangCode = document.getElementById("currentLangCode");
+const langOptionButtons = document.querySelectorAll(".lang-option");
 const addProductButton = document.getElementById("addProductButton");
 const stockButtonLabel = document.getElementById("stockButtonLabel");
 const stockModalTitle = document.getElementById("stockModalTitle");
 const loadingText = document.getElementById("loadingText");
 const emptyTitle = document.getElementById("emptyTitle");
 const emptyHelp = document.getElementById("emptyHelp");
-const modalTitle = document.getElementById("modalTitle");
 const labelProductName = document.getElementById("labelProductName");
 const labelProductDesc = document.getElementById("labelProductDesc");
 const labelProductPrice = document.getElementById("labelProductPrice");
@@ -209,20 +228,44 @@ const sectionTitle = document.getElementById("sectionTitle");
 const loadingState = document.getElementById("loadingState");
 const emptyState = document.getElementById("emptyState");
 const addProductForm = document.getElementById("addProductForm");
-const productImageInput = document.getElementById("productImage");
+const addImageBtn = document.getElementById("addImageBtn");
+const addImageBtnText = document.getElementById("addImageBtnText");
+const productImageCameraInput = document.getElementById("productImageCamera");
+const productImageGalleryInput = document.getElementById("productImageGallery");
+const imageSourceModalEl = document.getElementById("imageSourceModal");
+const imageSourceModal = new bootstrap.Modal(imageSourceModalEl);
+const chooseCameraBtn = document.getElementById("chooseCameraBtn");
+const chooseGalleryBtn = document.getElementById("chooseGalleryBtn");
+const actionCameraText = document.getElementById("actionCameraText");
+const actionGalleryText = document.getElementById("actionGalleryText");
+const actionCancelText = document.getElementById("actionCancelText");
 const imagePreviewWrap = document.getElementById("imagePreviewWrap");
 const saveBtn = document.getElementById("saveBtn");
 const saveBtnText = document.getElementById("saveBtnText");
 const saveBtnSpinner = document.getElementById("saveBtnSpinner");
-const addProductModalEl = document.getElementById("addProductModal");
-const addProductModal = new bootstrap.Modal(addProductModalEl);
-const viewProductModalEl = document.getElementById("viewProductModal");
-const viewProductModal = new bootstrap.Modal(viewProductModalEl);
+// ------------------- Full-page routing elements -------------------
+const pageListEl = document.getElementById("page-list");
+const pageFormEl = document.getElementById("page-form");
+const pageViewEl = document.getElementById("page-view");
+const formBackBtn = document.getElementById("formBackBtn");
+const formBackLabel = document.getElementById("formBackLabel");
+const formPageTitleText = document.getElementById("formPageTitleText");
+const formPageTitleIcon = document.querySelector("#formPageTitle i");
+const viewBackBtn = document.getElementById("viewBackBtn");
+const viewBackLabel = document.getElementById("viewBackLabel");
+const viewLoadingState = document.getElementById("viewLoadingState");
+const viewLoadingText = document.getElementById("viewLoadingText");
+const viewNotFoundState = document.getElementById("viewNotFoundState");
+const viewNotFoundText = document.getElementById("viewNotFoundText");
+const viewContent = document.getElementById("viewContent");
 const viewProductTitle = document.getElementById("viewProductTitle");
 const viewCarouselInner = document.getElementById("viewCarouselInner");
+const viewThumbStrip = document.getElementById("viewThumbStrip");
 const viewProductDesc = document.getElementById("viewProductDesc");
 const viewProductPrice = document.getElementById("viewProductPrice");
 const viewProductDate = document.getElementById("viewProductDate");
+const viewProductCategory = document.getElementById("viewProductCategory");
+const viewProductQtyBadge = document.getElementById("viewProductQtyBadge");
 const viewEditBtn = document.getElementById("viewEditBtn");
 const viewEditBtnText = document.getElementById("viewEditBtnText");
 const viewDeleteBtn = document.getElementById("viewDeleteBtn");
@@ -247,6 +290,12 @@ const confirmDeleteModalEl = document.getElementById("confirmDeleteModal");
 const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalEl);
 const confirmDeleteOkBtn = document.getElementById("confirmDeleteOkBtn");
 let pendingDeleteProduct = null;
+
+const LANG_META = {
+  th: { flag: "🇹🇭", code: "TH" },
+  en: { flag: "🇬🇧", code: "EN" },
+  zh: { flag: "🇨🇳", code: "ZH" },
+};
 
 let currentLang = localStorage.getItem("appLanguage") || "th";
 let currentEditId = null;
@@ -298,20 +347,27 @@ function setLanguage(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
   document.title = translations[lang].pageTitle;
-  addProductButton.innerHTML = `<i class="bi bi-plus-lg"></i> ${translations[lang].addProductButton}`;
+  addProductButton.innerHTML = `<i class="bi bi-plus-lg"></i> <span class="btn-label-text">${translations[lang].addProductButton}</span>`;
   sectionTitle.innerHTML = `<i class="bi bi-box-seam"></i> ${translations[lang].sectionTitle}`;
   searchInput.placeholder = translations[lang].searchPlaceholder;
   loadingText.textContent = translations[lang].loadingText;
   emptyTitle.textContent = translations[lang].emptyTitle;
   emptyHelp.textContent = translations[lang].emptyHelp;
-  modalTitle.innerHTML = currentEditId
-    ? `<i class="bi bi-pencil-square"></i> ${translations[lang].editModalTitle}`
-    : `<i class="bi bi-plus-circle"></i> ${translations[lang].modalTitle}`;
+  formPageTitleText.textContent = currentEditId ? translations[lang].editModalTitle : translations[lang].modalTitle;
+  formPageTitleIcon.className = currentEditId ? "bi bi-pencil-square" : "bi bi-plus-circle";
+  formBackLabel.textContent = translations[lang].backButton;
+  viewBackLabel.textContent = translations[lang].backButton;
+  viewLoadingText.textContent = translations[lang].loadingText;
+  viewNotFoundText.textContent = translations[lang].notFoundText;
   labelProductName.innerHTML = `${translations[lang].labelProductName} <span class="text-danger">*</span>`;
   labelProductDesc.textContent = translations[lang].labelProductDesc;
   labelProductPrice.innerHTML = `${translations[lang].labelProductPrice} <span class="text-danger">*</span>`;
   labelProductImage.textContent = translations[lang].labelProductImage;
   imageHelperText.textContent = translations[lang].imageHelperText;
+  addImageBtnText.textContent = translations[lang].addImageBtn;
+  actionCameraText.textContent = translations[lang].actionCamera;
+  actionGalleryText.textContent = translations[lang].actionGallery;
+  actionCancelText.textContent = translations[lang].actionCancel;
   labelProductCategory.textContent = translations[lang].labelProductCategory;
   labelProductQty.textContent = translations[lang].labelProductQty;
   populateCategoryOptions();
@@ -339,12 +395,19 @@ function setLanguage(lang) {
   document.getElementById("productName").placeholder = translations[lang].placeholderProductName;
   document.getElementById("productDesc").placeholder = translations[lang].placeholderProductDesc;
   saveBtnText.innerHTML = `<i class="bi bi-save"></i> ${translations[lang].saveButton}`;
-  languageSelect.value = lang;
+  const meta = LANG_META[lang] || LANG_META.th;
+  currentLangFlag.textContent = meta.flag;
+  currentLangCode.textContent = meta.code;
+  langOptionButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.lang === lang);
+  });
   localStorage.setItem("appLanguage", lang);
   applyProductFilter();
 }
 
-languageSelect?.addEventListener("change", (e) => setLanguage(e.target.value));
+langOptionButtons.forEach((btn) => {
+  btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
+});
 
 setLanguage(currentLang);
 
@@ -498,12 +561,30 @@ function renderImagePreviews() {
   });
 }
 
-productImageInput.addEventListener("change", () => {
-  const files = Array.from(productImageInput.files || []);
-  pendingFiles = pendingFiles.concat(files);
-  productImageInput.value = "";
-  renderImagePreviews();
+// เปิด Action Sheet ให้ผู้ใช้เลือกว่าจะถ่ายภาพใหม่ หรือเลือกจากคลังภาพที่มีอยู่แล้ว
+addImageBtn.addEventListener("click", () => {
+  imageSourceModal.show();
 });
+
+chooseCameraBtn.addEventListener("click", () => {
+  imageSourceModal.hide();
+  productImageCameraInput.click();
+});
+
+chooseGalleryBtn.addEventListener("click", () => {
+  imageSourceModal.hide();
+  productImageGalleryInput.click();
+});
+
+function handleSelectedImageFiles(inputEl) {
+  const files = Array.from(inputEl.files || []);
+  pendingFiles = pendingFiles.concat(files);
+  inputEl.value = "";
+  renderImagePreviews();
+}
+
+productImageCameraInput.addEventListener("change", () => handleSelectedImageFiles(productImageCameraInput));
+productImageGalleryInput.addEventListener("change", () => handleSelectedImageFiles(productImageGalleryInput));
 
 // ------------------- ฟังก์ชันลบรูปจาก Supabase Storage -------------------
 async function deleteProductImage(imageUrl) {
@@ -529,27 +610,48 @@ async function deleteProductImages(imageUrls) {
    ส่วนที่ 3: ระบบ CRUD (Fetch / Insert / Delete)
    ============================================================ */
 
+// ------------------- Skeleton loading placeholders -------------------
+function renderSkeletonGrid(count = 8) {
+  productGrid.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const col = document.createElement("div");
+    col.className = "col-6 col-sm-6 col-md-4 col-xl-3";
+    col.innerHTML = `
+      <div class="card product-card skeleton-card h-100">
+        <div class="product-img-wrap skeleton-shimmer"></div>
+        <div class="card-body d-flex flex-column">
+          <div class="skeleton-line skeleton-shimmer" style="width:38%;height:14px;margin-bottom:12px;"></div>
+          <div class="skeleton-line skeleton-shimmer" style="width:80%;height:16px;margin-bottom:8px;"></div>
+          <div class="skeleton-line skeleton-shimmer" style="width:100%;height:12px;margin-bottom:6px;"></div>
+          <div class="skeleton-line skeleton-shimmer" style="width:55%;height:12px;margin-bottom:14px;"></div>
+          <div class="skeleton-line skeleton-shimmer" style="width:45%;height:16px;"></div>
+        </div>
+      </div>
+    `;
+    productGrid.appendChild(col);
+  }
+}
+
 // ------------------- Fetch รายการสินค้าทั้งหมด -------------------
 async function fetchProducts() {
-  loadingState.classList.remove("d-none");
+  renderSkeletonGrid();
   emptyState.classList.add("d-none");
-  productGrid.innerHTML = "";
 
   const { data, error } = await supabaseClient
     .from(TABLE_NAME)
     .select("*")
     .order("created_at", { ascending: false });
 
-  loadingState.classList.add("d-none");
-
   if (error) {
     console.error("Fetch error:", error);
+    productGrid.innerHTML = "";
     showToast(translations[currentLang].loadError + error.message, "danger");
     return;
   }
 
   if (!data || data.length === 0) {
     allProducts = [];
+    productGrid.innerHTML = "";
     emptyState.classList.remove("d-none");
     setProductCount(0);
     updateDashboardStats();
@@ -653,14 +755,121 @@ async function renderProducts(products) {
 
   document.querySelectorAll(".product-card").forEach((card) => {
     card.addEventListener("click", () => {
-      const product = allProducts.find((item) => item.id.toString() === card.dataset.id.toString());
-      if (product) openViewModal(product);
+      navigateTo(`/products/${encodeURIComponent(card.dataset.id)}`);
     });
   });
 }
 
-function openViewModal(product) {
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ============================================================
+   ส่วนที่ 4: Full-page Router (Add Product / Product Details)
+   ใช้ hash-based routing แทน Modal/Popup เดิม:
+   #/                     -> หน้ารายการสินค้า
+   #/products/add         -> หน้าเพิ่มสินค้าใหม่ (เต็มหน้า)
+   #/products/edit/:id    -> หน้าแก้ไขสินค้า (เต็มหน้า, ใช้ฟอร์มเดียวกับเพิ่มสินค้า)
+   #/products/:id         -> หน้ารายละเอียดสินค้า (เต็มหน้า)
+   ============================================================ */
+
+function navigateTo(path) {
+  location.hash = `#${path}`;
+}
+
+function parseRoute() {
+  const hash = (location.hash || "").replace(/^#/, "");
+  if (!hash || hash === "/") return { name: "list" };
+
+  let m = hash.match(/^\/products\/add\/?$/);
+  if (m) return { name: "add" };
+
+  m = hash.match(/^\/products\/edit\/([^/]+)\/?$/);
+  if (m) return { name: "edit", id: decodeURIComponent(m[1]) };
+
+  m = hash.match(/^\/products\/([^/]+)\/?$/);
+  if (m) return { name: "view", id: decodeURIComponent(m[1]) };
+
+  return { name: "list" };
+}
+
+function showOnlyPage(name) {
+  pageListEl.classList.toggle("d-none", name !== "list");
+  pageFormEl.classList.toggle("d-none", name !== "add" && name !== "edit");
+  pageViewEl.classList.toggle("d-none", name !== "view");
+  window.scrollTo(0, 0);
+}
+
+async function router() {
+  const route = parseRoute();
+
+  if (route.name === "list") {
+    showOnlyPage("list");
+    return;
+  }
+
+  if (route.name === "add") {
+    resetProductForm();
+    showOnlyPage("add");
+    return;
+  }
+
+  if (route.name === "edit") {
+    showOnlyPage("edit");
+    const product = await resolveProductById(route.id);
+    if (product) {
+      fillProductForm(product);
+    } else {
+      // หาสินค้าไม่เจอ กลับไปหน้ารายการ
+      navigateTo("/");
+    }
+    return;
+  }
+
+  if (route.name === "view") {
+    showOnlyPage("view");
+    await renderViewPage(route.id);
+    return;
+  }
+}
+
+window.addEventListener("hashchange", router);
+
+// ------------------- หน้ารายละเอียดสินค้า (Product Details) -------------------
+async function resolveProductById(id) {
+  const cached = allProducts.find((item) => item.id.toString() === String(id));
+  if (cached) return cached;
+
+  const matchValue = /^\d+$/.test(id) ? Number(id) : id;
+  const { data, error } = await supabaseClient
+    .from(TABLE_NAME)
+    .select("*")
+    .eq("id", matchValue)
+    .single();
+
+  if (error || !data) return null;
+  return data;
+}
+
+async function renderViewPage(id) {
+  currentViewProduct = null;
+  viewContent.classList.add("d-none");
+  viewNotFoundState.classList.add("d-none");
+  viewLoadingState.classList.remove("d-none");
+
+  const product = await resolveProductById(id);
+
+  viewLoadingState.classList.add("d-none");
+
+  if (!product) {
+    viewNotFoundState.classList.remove("d-none");
+    return;
+  }
+
   currentViewProduct = product;
+
   const images = (Array.isArray(product.images) && product.images.length > 0)
     ? product.images
     : (product.image_url ? [product.image_url] : []);
@@ -668,15 +877,19 @@ function openViewModal(product) {
   const qty = Number(product.quantity) || 0;
   const qtyClass = qty <= 0 ? "qty-out" : (qty <= LOW_STOCK_THRESHOLD ? "qty-low" : "qty-ok");
   const qtyText = qty <= 0 ? translations[currentLang].outOfStock : `${translations[currentLang].qtyLabel} ${qty}`;
-  const categoryBadge = product.category ? `<span class="category-badge me-2">${escapeHtml(getCategoryLabel(product.category, currentLang))}</span>` : "";
 
-  viewProductTitle.innerHTML = `${escapeHtml(product.name || "")}`;
-  viewProductDesc.innerHTML = `${categoryBadge}<span class="qty-badge ${qtyClass}">${qtyText}</span>
-    <div class="mt-2">${escapeHtml(product.description || translations[currentLang].noDescription)}</div>`;
+  viewProductCategory.textContent = product.category ? getCategoryLabel(product.category, currentLang) : "";
+  viewProductCategory.classList.toggle("d-none", !product.category);
+  viewProductQtyBadge.textContent = qtyText;
+  viewProductQtyBadge.className = `qty-badge ${qtyClass}`;
+
+  viewProductTitle.textContent = product.name || "";
   viewProductPrice.textContent = formatPrice(product.price);
+  viewProductDesc.textContent = product.description || translations[currentLang].noDescription;
   viewProductDate.innerHTML = `<i class="bi bi-clock-history"></i> ${formatDate(product.created_at)}`;
 
   viewCarouselInner.innerHTML = "";
+  viewThumbStrip.innerHTML = "";
   if (images.length === 0) {
     viewCarouselInner.innerHTML = `
       <div class="carousel-item active">
@@ -689,31 +902,56 @@ function openViewModal(product) {
       item.className = `carousel-item${idx === 0 ? " active" : ""}`;
       item.innerHTML = `<div class="carousel-img-wrap"><img src="${url}" alt="${escapeHtml(product.name)}"></div>`;
       viewCarouselInner.appendChild(item);
+
+      if (images.length > 1) {
+        const thumb = document.createElement("img");
+        thumb.src = url;
+        thumb.alt = escapeHtml(product.name);
+        thumb.className = idx === 0 ? "active" : "";
+        thumb.addEventListener("click", () => {
+          const carousel = bootstrap.Carousel.getOrCreateInstance(document.getElementById("viewProductCarousel"));
+          carousel.to(idx);
+        });
+        viewThumbStrip.appendChild(thumb);
+      }
     });
   }
 
-  viewProductModal.show();
+  viewContent.classList.remove("d-none");
 }
+
+// ซิงค์ thumbnail ที่ active ตามรูปที่กำลังแสดงใน carousel
+document.getElementById("viewProductCarousel")?.addEventListener("slide.bs.carousel", (e) => {
+  viewThumbStrip.querySelectorAll("img").forEach((img, idx) => {
+    img.classList.toggle("active", idx === e.to);
+  });
+});
 
 viewEditBtn.addEventListener("click", () => {
   if (!currentViewProduct) return;
-  viewProductModal.hide();
-  openEditModal(currentViewProduct);
+  navigateTo(`/products/edit/${encodeURIComponent(currentViewProduct.id)}`);
 });
 
 viewDeleteBtn.addEventListener("click", () => {
   if (!currentViewProduct) return;
-  viewProductModal.hide();
   requestDelete(currentViewProduct);
 });
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
+// ------------------- หน้าเพิ่ม/แก้ไขสินค้า (Add / Edit Product) -------------------
+function resetProductForm() {
+  currentEditId = null;
+  existingImages = [];
+  pendingFiles = [];
+  addProductForm.reset();
+  renderImagePreviews();
+  productCategorySelect.value = CATEGORY_KEYS[0];
+  productQtyInput.value = 1;
+  formPageTitleText.textContent = translations[currentLang].modalTitle;
+  formPageTitleIcon.className = "bi bi-plus-circle";
+  saveBtnText.innerHTML = `<i class="bi bi-save"></i> ${translations[currentLang].saveButton}`;
 }
 
-function openEditModal(product) {
+function fillProductForm(product) {
   currentEditId = String(product.id);
   existingImages = (Array.isArray(product.images) && product.images.length > 0)
     ? [...product.images]
@@ -727,20 +965,16 @@ function openEditModal(product) {
   productQtyInput.value = product.quantity ?? 1;
   renderImagePreviews();
 
-  modalTitle.textContent = translations[currentLang].editModalTitle;
+  formPageTitleText.textContent = translations[currentLang].editModalTitle;
+  formPageTitleIcon.className = "bi bi-pencil-square";
   saveBtnText.innerHTML = `<i class="bi bi-save"></i> ${translations[currentLang].saveButton}`;
-  addProductModal.show();
 }
 
-addProductButton.addEventListener("click", () => {
-  currentEditId = null;
-  existingImages = [];
-  pendingFiles = [];
-  renderImagePreviews();
-  productCategorySelect.value = CATEGORY_KEYS[0];
-  productQtyInput.value = 1;
-  modalTitle.textContent = translations[currentLang].modalTitle;
-  saveBtnText.innerHTML = `<i class="bi bi-save"></i> ${translations[currentLang].saveButton}`;
+// ปุ่มกลับของหน้าฟอร์ม / หน้ารายละเอียด และปุ่มยกเลิกในฟอร์ม
+formBackBtn.addEventListener("click", () => history.length > 1 ? history.back() : navigateTo("/"));
+viewBackBtn.addEventListener("click", () => history.length > 1 ? history.back() : navigateTo("/"));
+document.getElementById("cancelBtn").addEventListener("click", () => {
+  history.length > 1 ? history.back() : navigateTo("/");
 });
 
 // ------------------- Insert / Edit สินค้า -------------------
@@ -830,8 +1064,8 @@ addProductForm.addEventListener("submit", async (e) => {
     productCategorySelect.value = CATEGORY_KEYS[0];
     productQtyInput.value = 1;
     renderImagePreviews();
-    addProductModal.hide();
     await fetchProducts();
+    navigateTo("/");
   } catch (err) {
     console.error("Insert error:", err);
     showToast(translations[currentLang].saveError + (err?.message || err), "danger");
@@ -873,19 +1107,13 @@ async function handleDelete(product) {
 
     showToast(translations[currentLang].deleted);
     await fetchProducts();
+    navigateTo("/");
   } catch (err) {
     console.error("Delete error:", err);
     showToast(translations[currentLang].deleteError + err.message, "danger");
   }
 }
 
-// รีเซ็ตฟอร์มเมื่อปิด Modal
-addProductModalEl.addEventListener("hidden.bs.modal", () => {
-  currentEditId = null;
-  existingImages = [];
-  pendingFiles = [];
-  renderImagePreviews();
-});
-
 // ------------------- Init -------------------
 fetchProducts();
+router();
