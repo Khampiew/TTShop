@@ -2,7 +2,9 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A369D">
+<meta name="format-detection" content="telephone=no">
 <title>CompStock Manager - ระบบจัดการสินค้าอุปกรณ์คอมพิวเตอร์</title>
 
 <!-- Bootstrap 5 CSS -->
@@ -15,120 +17,135 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-custom sticky-top py-3">
-  <div class="container d-flex flex-column flex-md-row align-items-center gap-3 justify-content-between">
-    <span class="navbar-brand-custom d-flex align-items-center gap-2 mb-0">
-      <i class="bi bi-hdd-stack-fill"></i> CompStock Manager
-    </span>
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-      <select id="languageSelect" class="form-select form-select-sm w-auto">
-        <option value="th">🇹🇭 ไทย</option>
-        <option value="en">🇬🇧 English</option>
-        <option value="zh">🇨🇳 中文</option>
-      </select>
-      <button id="stockButton" class="btn btn-outline-primary px-3" data-bs-toggle="modal" data-bs-target="#stockModal">
-        <i class="bi bi-clipboard-data"></i> <span id="stockButtonLabel">สต๊อกสินค้า</span>
+<nav class="navbar navbar-custom sticky-top py-2 py-md-3">
+  <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <a href="#/" class="navbar-brand-custom d-flex align-items-center gap-2 mb-0 text-decoration-none">
+      <i class="bi bi-hdd-stack-fill"></i> <span class="brand-text">CompStock Manager</span>
+    </a>
+    <div class="header-actions d-flex align-items-center gap-2 flex-wrap justify-content-end">
+
+      <!-- Minimal language switcher -->
+      <div class="dropdown lang-dropdown">
+        <button class="btn lang-toggle-btn dropdown-toggle" type="button" id="languageDropdownBtn"
+          data-bs-toggle="dropdown" aria-expanded="false" aria-label="เปลี่ยนภาษา / Change language">
+          <span id="currentLangFlag">🇹🇭</span><span id="currentLangCode">TH</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end lang-dropdown-menu" aria-labelledby="languageDropdownBtn">
+          <li><button type="button" class="dropdown-item lang-option" data-lang="th"><span>🇹🇭</span> ไทย</button></li>
+          <li><button type="button" class="dropdown-item lang-option" data-lang="en"><span>🇬🇧</span> English</button></li>
+          <li><button type="button" class="dropdown-item lang-option" data-lang="zh"><span>🇨🇳</span> 中文</button></li>
+        </ul>
+      </div>
+
+      <button id="stockButton" class="btn btn-outline-primary btn-header-action px-3" data-bs-toggle="modal" data-bs-target="#stockModal">
+        <i class="bi bi-clipboard-data"></i> <span id="stockButtonLabel" class="btn-label-text">สต๊อกสินค้า</span>
       </button>
-      <button id="addProductButton" class="btn btn-navy px-3" data-bs-toggle="modal" data-bs-target="#addProductModal">
-        <i class="bi bi-plus-lg"></i> เพิ่มสินค้าใหม่
-      </button>
+      <a id="addProductButton" href="#/products/add" class="btn btn-navy btn-header-action px-3">
+        <i class="bi bi-plus-lg"></i> <span class="btn-label-text">เพิ่มสินค้าใหม่</span>
+      </a>
     </div>
   </div>
 </nav>
 
-<div class="container py-4">
+<!-- ============ PAGE: Product List ============ -->
+<div id="page-list" class="page-section">
+  <div class="container py-4">
 
-  <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 gap-3">
-    <h5 id="sectionTitle" class="section-title mb-0"><i class="bi bi-box-seam"></i> รายการสินค้าอุปกรณ์คอมพิวเตอร์</h5>
-    <div class="d-flex flex-column flex-sm-row gap-2 w-100" style="max-width: 720px;">
-      <input id="searchInput" type="search" class="form-control" placeholder="ค้นหาสินค้า... เช่น RAM, SSD, CPU">
-      <select id="categoryFilter" class="form-select" style="max-width: 180px;">
-        <option value="">ทุกหมวดหมู่</option>
-      </select>
-      <select id="sortSelect" class="form-select" style="max-width: 190px;">
-        <option value="newest">ใหม่ล่าสุด</option>
-        <option value="oldest">เก่าสุด</option>
-        <option value="price_asc">ราคา: น้อย → มาก</option>
-        <option value="price_desc">ราคา: มาก → น้อย</option>
-        <option value="name_asc">ชื่อ: ก → ฮ</option>
-      </select>
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-3 gap-3">
+      <h5 id="sectionTitle" class="section-title mb-0"><i class="bi bi-box-seam"></i> รายการสินค้าอุปกรณ์คอมพิวเตอร์</h5>
+      <div class="d-flex flex-column flex-sm-row gap-2 w-100" style="max-width: 720px;">
+        <input id="searchInput" type="search" class="form-control" placeholder="ค้นหาสินค้า... เช่น RAM, SSD, CPU">
+        <select id="categoryFilter" class="form-select" style="max-width: 180px;">
+          <option value="">ทุกหมวดหมู่</option>
+        </select>
+        <select id="sortSelect" class="form-select" style="max-width: 190px;">
+          <option value="newest">ใหม่ล่าสุด</option>
+          <option value="oldest">เก่าสุด</option>
+          <option value="price_asc">ราคา: น้อย → มาก</option>
+          <option value="price_desc">ราคา: มาก → น้อย</option>
+          <option value="name_asc">ชื่อ: ก → ฮ</option>
+        </select>
+      </div>
     </div>
-  </div>
-  <div class="mb-3 text-muted small"><span id="productCount">0</span></div>
+    <div class="mb-3 text-muted small"><span id="productCount">0</span></div>
 
-  <!-- Loading -->
-  <div id="loadingState" class="loading-state">
-    <div class="spinner-border" style="color: var(--blue);" role="status"></div>
-    <p id="loadingText" class="mt-3">กำลังโหลดข้อมูลสินค้า...</p>
-  </div>
+    <!-- Loading (fallback, replaced by skeleton cards in the grid) -->
+    <div id="loadingState" class="loading-state d-none">
+      <div class="spinner-border" style="color: var(--blue);" role="status"></div>
+      <p id="loadingText" class="mt-3">กำลังโหลดข้อมูลสินค้า...</p>
+    </div>
 
-  <!-- Empty state -->
-  <div id="emptyState" class="empty-state d-none">
-    <i class="bi bi-inbox"></i>
-    <p id="emptyTitle" class="mt-3 mb-0">ยังไม่มีสินค้าในระบบ</p>
-    <p id="emptyHelp">กดปุ่ม "เพิ่มสินค้าใหม่" เพื่อเริ่มบันทึกข้อมูล</p>
-  </div>
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state d-none">
+      <i class="bi bi-inbox"></i>
+      <p id="emptyTitle" class="mt-3 mb-0">ยังไม่มีสินค้าในระบบ</p>
+      <p id="emptyHelp">กดปุ่ม "เพิ่มสินค้าใหม่" เพื่อเริ่มบันทึกข้อมูล</p>
+    </div>
 
-  <!-- Product grid -->
-  <div id="productGrid" class="row g-4"></div>
+    <!-- Product grid -->
+    <div id="productGrid" class="row g-4"></div>
+  </div>
 </div>
 
-<!-- Add Product Modal -->
-<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 id="modalTitle" class="modal-title"><i class="bi bi-plus-circle"></i> เพิ่มสินค้าใหม่</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
+<!-- ============ PAGE: Add / Edit Product (full page, replaces modal) ============ -->
+<div id="page-form" class="page-section d-none">
+  <div class="container py-4 page-form-container">
+    <button type="button" id="formBackBtn" class="btn back-btn mb-3"><i class="bi bi-arrow-left"></i> <span id="formBackLabel">กลับ</span></button>
+
+    <div class="form-page-card">
+      <h4 id="formPageTitle" class="mb-4"><i class="bi bi-plus-circle"></i> <span id="formPageTitleText">เพิ่มสินค้าใหม่</span></h4>
+
       <form id="addProductForm">
-        <div class="modal-body">
 
-          <div class="mb-3">
-            <label id="labelProductName" class="form-label fw-semibold">ชื่อสินค้า <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="productName" placeholder="เช่น RAM DDR4 16GB" required>
-          </div>
-
-          <div class="mb-3">
-            <label id="labelProductDesc" class="form-label fw-semibold">รายละเอียดสินค้า</label>
-            <textarea class="form-control" id="productDesc" rows="3" placeholder="รายละเอียด สเปค หรือหมายเหตุเพิ่มเติม"></textarea>
-          </div>
-
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label id="labelProductCategory" class="form-label fw-semibold">หมวดหมู่</label>
-              <select class="form-select" id="productCategory"></select>
-            </div>
-            <div class="col-md-6">
-              <label id="labelProductQty" class="form-label fw-semibold">จำนวนคงเหลือ</label>
-              <div class="qty-stepper">
-                <button type="button" class="btn btn-outline-secondary" id="qtyMinusBtn"><i class="bi bi-dash"></i></button>
-                <input type="number" class="form-control" id="productQty" min="0" step="1" value="1">
-                <button type="button" class="btn btn-outline-secondary" id="qtyPlusBtn"><i class="bi bi-plus"></i></button>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label id="labelProductPrice" class="form-label fw-semibold">ราคา (กีบ) <span class="text-danger">*</span></label>
-            <div class="input-group">
-              <span id="priceCurrency" class="input-group-text">₭</span>
-              <input type="number" class="form-control" id="productPrice" min="0" step="0.01" placeholder="0.00" required>
-            </div>
-          </div>
-
-          <div class="mb-2">
-            <label id="labelProductImage" class="form-label fw-semibold">รูปภาพสินค้า</label>
-            <input type="file" class="form-control" id="productImage" accept="image/*" capture="environment" multiple>
-            <div id="imageHelperText" class="form-text"><i class="bi bi-camera"></i> เพิ่มได้หลายรูป เลือกไฟล์หรือถ่ายจากกล้องมือถือได้</div>
-          </div>
-
-          <div id="imagePreviewWrap"></div>
-
+        <div class="mb-3">
+          <label id="labelProductName" class="form-label fw-semibold">ชื่อสินค้า <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="productName" placeholder="เช่น RAM DDR4 16GB" required>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="cancelBtn" class="btn btn-outline-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="submit" class="btn btn-navy" id="saveBtn">
+
+        <div class="mb-3">
+          <label id="labelProductDesc" class="form-label fw-semibold">รายละเอียดสินค้า</label>
+          <textarea class="form-control" id="productDesc" rows="3" placeholder="รายละเอียด สเปค หรือหมายเหตุเพิ่มเติม"></textarea>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label id="labelProductCategory" class="form-label fw-semibold">หมวดหมู่</label>
+            <select class="form-select" id="productCategory"></select>
+          </div>
+          <div class="col-md-6">
+            <label id="labelProductQty" class="form-label fw-semibold">จำนวนคงเหลือ</label>
+            <div class="qty-stepper">
+              <button type="button" class="btn btn-outline-secondary" id="qtyMinusBtn"><i class="bi bi-dash"></i></button>
+              <input type="number" class="form-control" id="productQty" min="0" step="1" value="1">
+              <button type="button" class="btn btn-outline-secondary" id="qtyPlusBtn"><i class="bi bi-plus"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label id="labelProductPrice" class="form-label fw-semibold">ราคา (กีบ) <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span id="priceCurrency" class="input-group-text">₭</span>
+            <input type="number" class="form-control" id="productPrice" min="0" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label id="labelProductImage" class="form-label fw-semibold">รูปภาพสินค้า</label>
+          <button type="button" id="addImageBtn" class="btn btn-add-image w-100">
+            <i class="bi bi-camera"></i> <span id="addImageBtnText">เพิ่มรูปภาพ</span>
+          </button>
+          <!-- Hidden native file inputs: one forces the camera, one opens the photo library -->
+          <input type="file" id="productImageCamera" accept="image/*" capture="environment" multiple class="d-none">
+          <input type="file" id="productImageGallery" accept="image/*" multiple class="d-none">
+          <div id="imageHelperText" class="form-text"><i class="bi bi-info-circle"></i> เพิ่มได้หลายรูป เลือกไฟล์หรือถ่ายจากกล้องมือถือได้</div>
+        </div>
+
+        <div id="imagePreviewWrap"></div>
+
+        <div class="form-page-actions">
+          <button type="button" id="cancelBtn" class="btn btn-outline-secondary px-4">ยกเลิก</button>
+          <button type="submit" class="btn btn-navy px-4" id="saveBtn">
             <span id="saveBtnText"><i class="bi bi-save"></i> บันทึกสินค้า</span>
             <span id="saveBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
           </button>
@@ -138,16 +155,24 @@
   </div>
 </div>
 
-<!-- View Product Modal -->
-<div class="modal fade" id="viewProductModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 id="viewProductTitle" class="modal-title"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div id="viewProductCarousel" class="carousel slide mb-3">
+<!-- ============ PAGE: Product Details (full page, replaces popup) ============ -->
+<div id="page-view" class="page-section d-none">
+  <div class="container py-4">
+    <button type="button" id="viewBackBtn" class="btn back-btn mb-3"><i class="bi bi-arrow-left"></i> <span id="viewBackLabel">กลับ</span></button>
+
+    <div id="viewLoadingState" class="loading-state d-none">
+      <div class="spinner-border" style="color: var(--blue);" role="status"></div>
+      <p id="viewLoadingText" class="mt-3">กำลังโหลดข้อมูลสินค้า...</p>
+    </div>
+
+    <div id="viewNotFoundState" class="empty-state d-none">
+      <i class="bi bi-exclamation-circle"></i>
+      <p id="viewNotFoundText" class="mt-3 mb-0">ไม่พบสินค้านี้</p>
+    </div>
+
+    <div id="viewContent" class="detail-layout d-none">
+      <div class="detail-gallery">
+        <div id="viewProductCarousel" class="carousel slide detail-carousel">
           <div class="carousel-inner" id="viewCarouselInner"></div>
           <button class="carousel-control-prev" type="button" data-bs-target="#viewProductCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -156,25 +181,33 @@
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
           </button>
         </div>
-        <p id="viewProductDesc" class="mb-3"></p>
-        <div class="d-flex justify-content-between align-items-center">
-          <span id="viewProductPrice" class="price-badge fs-5"></span>
-          <span id="viewProductDate" class="card-date"></span>
-        </div>
+        <div id="viewThumbStrip" class="thumb-strip"></div>
       </div>
-      <div class="modal-footer">
-        <button type="button" id="viewDeleteBtn" class="btn btn-outline-danger">
-          <i class="bi bi-trash"></i> <span id="viewDeleteBtnText">ลบ</span>
-        </button>
-        <button type="button" id="viewEditBtn" class="btn btn-navy">
-          <i class="bi bi-pencil"></i> <span id="viewEditBtnText">แก้ไข</span>
-        </button>
+
+      <div class="detail-info">
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+          <span id="viewProductCategory" class="category-badge"></span>
+          <span id="viewProductQtyBadge" class="qty-badge"></span>
+        </div>
+        <h2 id="viewProductTitle" class="detail-title"></h2>
+        <div id="viewProductPrice" class="detail-price"></div>
+        <p id="viewProductDesc" class="detail-desc"></p>
+        <div id="viewProductDate" class="card-date mb-4"></div>
+
+        <div class="detail-actions">
+          <button type="button" id="viewEditBtn" class="btn btn-navy btn-lg flex-fill">
+            <i class="bi bi-pencil"></i> <span id="viewEditBtnText">แก้ไข</span>
+          </button>
+          <button type="button" id="viewDeleteBtn" class="btn btn-outline-danger btn-lg flex-fill">
+            <i class="bi bi-trash"></i> <span id="viewDeleteBtnText">ลบ</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Confirm Delete Modal -->
+<!-- Confirm Delete Modal (kept as a small confirmation dialog, not a navigation flow) -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content">
@@ -237,6 +270,25 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Source Action Sheet (choose Camera or Photo Library) -->
+<div class="modal fade" id="imageSourceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm action-sheet-dialog">
+    <div class="modal-content action-sheet">
+      <div class="modal-body p-0">
+        <button type="button" id="chooseCameraBtn" class="action-sheet-btn">
+          <i class="bi bi-camera-fill"></i> <span id="actionCameraText">ถ่ายภาพใหม่</span>
+        </button>
+        <button type="button" id="chooseGalleryBtn" class="action-sheet-btn">
+          <i class="bi bi-images"></i> <span id="actionGalleryText">เลือกจากคลังภาพ</span>
+        </button>
+        <button type="button" class="action-sheet-btn action-sheet-cancel" data-bs-dismiss="modal">
+          <span id="actionCancelText">ยกเลิก</span>
+        </button>
       </div>
     </div>
   </div>
