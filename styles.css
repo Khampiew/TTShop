@@ -6,18 +6,38 @@
   }
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  html, body {
+    overscroll-behavior-y: contain;
+    height: 100%;
   }
   body {
     background-color: var(--bg);
     font-family: "Segoe UI", "Sarabun", Tahoma, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* ป้องกันการเลือกข้อความโดยไม่ตั้งใจตอนแตะปุ่ม/การ์ด ให้รู้สึกเหมือนแอปมากขึ้น */
+  button, .btn, .navbar-custom, .card-title-custom + .qty-badge, .category-badge, .qty-badge, .nav-link {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
   a, button, input, select, textarea, .btn, .form-control, .form-select {
     transition: background-color .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease), transform .15s var(--ease), opacity .2s var(--ease);
   }
   .navbar-custom {
-    background-color: #FFFFFF;
+    background-color: rgba(255,255,255,0.92);
     border-bottom: 1px solid #E9ECEF;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+  }
+  @supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+    .navbar-custom {
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      backdrop-filter: saturate(180%) blur(10px);
+    }
   }
   .navbar-brand-custom {
     color: var(--navy);
@@ -65,6 +85,11 @@
   .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 24px rgba(10,54,157,0.10);
+  }
+  .product-card:active {
+    transform: scale(.97);
+    box-shadow: 0 3px 10px rgba(10,54,157,0.10);
+    transition: transform .12s var(--ease), box-shadow .12s var(--ease);
   }
   .product-img-wrap {
     width: 100%;
@@ -241,6 +266,23 @@
     border: none;
     box-shadow: 0 20px 50px rgba(10,54,157,0.15);
   }
+  .modal-body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .modal-backdrop.show {
+    opacity: 0.55;
+  }
+  @supports (backdrop-filter: blur(3px)) or (-webkit-backdrop-filter: blur(3px)) {
+    .modal-backdrop.show {
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+    }
+  }
+  .stat-card:active {
+    transform: scale(.96);
+    transition: transform .12s var(--ease);
+  }
   .stat-value {
     font-weight: 700;
     font-size: 1.15rem;
@@ -299,7 +341,281 @@
     to { opacity: 1; transform: translateY(0); }
   }
   .product-card-col {
-    animation: cardFadeIn .35s ease both;
+    animation: cardFadeIn .35s var(--ease) both;
+  }
+
+  /* --- Skeleton loading placeholders --- */
+  .skeleton-card {
+    pointer-events: none;
+  }
+  .skeleton-line {
+    border-radius: 6px;
+  }
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+    background: #E9EDF4;
+  }
+  .skeleton-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%);
+    animation: skeletonShimmer 1.4s infinite;
+  }
+  @keyframes skeletonShimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  /* ============================================================
+     Full-page routing (Add Product / Product Details)
+     ============================================================ */
+
+  /* --- Page transition --- */
+  @keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .page-section {
+    animation: pageFadeIn .3s var(--ease) both;
+  }
+
+  /* --- Header actions (language / stock / add product) --- */
+  .header-actions {
+    row-gap: 8px;
+  }
+  .btn-header-action {
+    white-space: nowrap;
+  }
+
+  /* --- Header "Add Product" button (always visible, top navbar) --- */
+  #addProductButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(13,110,253,0.22);
+  }
+  #addProductButton:hover {
+    color: #fff;
+  }
+
+  /* --- Minimal / compact language switcher --- */
+  .lang-dropdown {
+    position: relative;
+  }
+  .lang-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #fff;
+    border: 1px solid #DDE3EE;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .lang-toggle-btn:hover,
+  .lang-toggle-btn:focus {
+    background-color: #F1F4F9;
+    color: var(--navy);
+  }
+  .lang-toggle-btn #currentLangFlag {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .lang-toggle-btn::after {
+    margin-left: 2px;
+    vertical-align: 1px;
+  }
+  .lang-dropdown-menu {
+    min-width: 150px;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #E9ECEF;
+    box-shadow: 0 8px 24px rgba(10,54,157,0.14);
+  }
+  .lang-dropdown-menu .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  .lang-dropdown-menu .lang-option.active,
+  .lang-dropdown-menu .lang-option:active {
+    background-color: rgba(13,110,253,0.1);
+    color: var(--navy);
+    font-weight: 700;
+  }
+
+  /* --- Back button --- */
+  .back-btn {
+    color: var(--navy);
+    font-weight: 600;
+    padding: 6px 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .back-btn:hover {
+    color: var(--blue);
+    transform: translateX(-2px);
+  }
+
+  /* --- Add / Edit Product page --- */
+  .page-form-container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .form-page-card {
+    background: #fff;
+    border: 1px solid #EDF0F5;
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 6px 24px rgba(10,54,157,0.06);
+  }
+  #formPageTitle {
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .form-page-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #EDF0F5;
+  }
+
+  /* --- Product Details page --- */
+  .detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 36px;
+    align-items: start;
+  }
+  .detail-gallery {
+    position: sticky;
+    top: 90px;
+  }
+  .detail-carousel .carousel-img-wrap,
+  .detail-carousel .carousel-item .carousel-img-wrap {
+    height: 420px;
+    border-radius: 16px;
+  }
+  .thumb-strip {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .thumb-strip img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    background: #F1F4F9;
+    transition: border-color .2s var(--ease), transform .15s var(--ease);
+  }
+  .thumb-strip img:hover {
+    transform: translateY(-2px);
+  }
+  .thumb-strip img.active {
+    border-color: var(--blue);
+  }
+  .detail-title {
+    color: #1B2430;
+    font-weight: 700;
+    font-size: 1.6rem;
+    word-break: break-word;
+  }
+  .detail-price {
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 1.7rem;
+    margin: 6px 0 14px;
+  }
+  .detail-desc {
+    color: #4A5364;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+  .detail-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  /* --- "Add photo" button (opens the camera / gallery action sheet) --- */
+  .btn-add-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1.5px dashed #B9C6DD;
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--navy);
+    font-weight: 600;
+    background-color: #F7F9FC;
+  }
+  .btn-add-image:hover,
+  .btn-add-image:focus {
+    border-color: var(--blue);
+    background-color: #EEF3FF;
+    color: var(--navy);
+  }
+  .btn-add-image i {
+    font-size: 1.1rem;
+    color: var(--blue);
+  }
+
+  /* --- Image source action sheet (Camera / Photo Library) --- */
+  .action-sheet-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+  }
+  .action-sheet {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .action-sheet-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: none;
+    background-color: #fff;
+    padding: 16px 18px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #212529;
+    border-bottom: 1px solid #F0F2F5;
+    text-align: left;
+  }
+  .action-sheet-btn:last-child {
+    border-bottom: none;
+  }
+  .action-sheet-btn:active {
+    background-color: #F1F4F9;
+  }
+  .action-sheet-btn i {
+    font-size: 1.15rem;
+    color: var(--blue);
+  }
+  .action-sheet-cancel {
+    justify-content: center;
+    color: #DC3545;
+    font-weight: 700;
   }
 
   /* --- Mobile responsive tweaks --- */
@@ -311,9 +627,22 @@
     .navbar-brand-custom {
       font-size: 1.1rem;
     }
-    #stockButton, #addProductButton {
+    /* บนมือถือ: ย่อปุ่มใน header ให้กระทัดรัด (แสดงเฉพาะไอคอน) แต่ยังคงอยู่บนสุดเสมอ ไม่ซ่อน */
+    .header-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+    .btn-label-text {
+      display: none;
+    }
+    #stockButton,
+    #addProductButton {
       font-size: 0.82rem;
-      padding: 6px 10px;
+      padding: 8px 12px;
+    }
+    .lang-toggle-btn {
+      padding: 6px 8px;
+      font-size: 0.78rem;
     }
     .stat-card {
       padding: 10px 10px;
@@ -363,5 +692,105 @@
     }
     .qty-stepper input {
       width: 64px;
+    }
+
+    /* ป้องกัน iOS/Android WebView ซูมอัตโนมัติเวลาแตะ input (ต้อง font-size >= 16px) */
+    .form-control, .form-select, textarea {
+      font-size: 16px;
+    }
+
+    /* เพิ่มพื้นที่แตะปุ่มให้ถึงมาตรฐาน touch target ~44px ของแอปทั่วไป */
+    .btn, .form-select, .form-control, #qtyMinusBtn, #qtyPlusBtn {
+      min-height: 44px;
+    }
+    .qty-stepper button {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* Action sheet กลายเป็น Bottom Sheet เลื่อนขึ้นจากขอบล่างจอแบบแอปมือถือทั่วไป */
+    .action-sheet-dialog {
+      align-items: flex-end;
+      min-height: 100vh;
+      margin: 0 auto;
+      max-width: 100%;
+      padding: 0 10px calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+    .action-sheet-dialog .action-sheet {
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+    }
+
+    /* --- Product Details page: สลับเป็นแนวตั้งบนมือถือ --- */
+    .detail-layout {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .detail-gallery {
+      position: static;
+    }
+    .detail-carousel .carousel-img-wrap,
+    .detail-carousel .carousel-item .carousel-img-wrap {
+      height: 260px;
+      border-radius: 14px;
+    }
+    .detail-title {
+      font-size: 1.25rem;
+    }
+    .detail-price {
+      font-size: 1.35rem;
+    }
+    .form-page-card {
+      padding: 18px 16px 16px;
+      border-radius: 14px;
+    }
+    .form-page-actions {
+      flex-direction: column-reverse;
+    }
+    .form-page-actions .btn {
+      width: 100%;
+    }
+
+    /* Toast เว้นระยะจากขอบจอสำหรับมือถือที่มี gesture bar / safe area */
+    .toast-container {
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* --- Bottom sheet modal: เลื่อนขึ้นจากด้านล่างแบบแอปมาตรฐาน (ยกเว้น modal-sm เช่นกล่องยืนยันลบ) --- */
+    .modal .modal-dialog:not(.modal-sm) {
+      margin: 0;
+      display: flex;
+      align-items: flex-end;
+      min-height: 100%;
+      max-width: 100%;
+    }
+    .modal .modal-dialog:not(.modal-sm) .modal-content {
+      width: 100%;
+      border-radius: 20px 20px 0 0;
+      max-height: 88vh;
+    }
+    .modal .modal-dialog:not(.modal-sm) .modal-body {
+      max-height: 62vh;
+      overflow-y: auto;
+    }
+    .modal.fade .modal-dialog:not(.modal-sm) {
+      transform: translateY(100%);
+    }
+    .modal.show .modal-dialog:not(.modal-sm) {
+      transform: translateY(0);
+    }
+    /* handle bar เล็กๆ ด้านบน modal เพื่อสื่อว่าลากปิดได้แบบ bottom sheet ของแอปทั่วไป */
+    .modal .modal-dialog:not(.modal-sm) .modal-content::before {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      border-radius: 2px;
+      background: #D6DEEA;
+      margin: 10px auto 0;
+    }
+    /* กล่องยืนยันลบยังคงเป็น alert กลางจอแบบแอปทั่วไป ไม่ใช่ bottom sheet */
+    .modal-dialog.modal-sm {
+      margin: 1.75rem auto;
     }
   }
