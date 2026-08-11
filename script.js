@@ -11,17 +11,60 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const BUCKET_NAME = "product-images";
 const TABLE_NAME = "products";
-const CATEGORY_KEYS = ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "peripheral", "other"];
-const CATEGORY_LABELS = {
-  th: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "เมนบอร์ด", gpu: "การ์ดจอ", psu: "เพาเวอร์ซัพพลาย", case: "เคสคอมพิวเตอร์", monitor: "จอมอนิเตอร์", peripheral: "อุปกรณ์ต่อพ่วง", other: "อื่นๆ" },
-  en: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "Motherboard", gpu: "Graphics Card", psu: "Power Supply", case: "Computer Case", monitor: "Monitor", peripheral: "Peripherals", other: "Other" },
-  zh: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "主板", gpu: "显卡", psu: "电源", case: "机箱", monitor: "显示器", peripheral: "外围设备", other: "其他" },
+
+// ------------------- หมวดหมู่ MacBook แยกตามปี (2015 - ปีล่าสุด) -------------------
+const MACBOOK_YEAR_START = 2015;
+const MACBOOK_YEAR_END = new Date().getFullYear();
+const MACBOOK_YEAR_KEYS = [];
+for (let y = MACBOOK_YEAR_END; y >= MACBOOK_YEAR_START; y--) {
+  MACBOOK_YEAR_KEYS.push(`macbook_${y}`);
+}
+
+const CATEGORY_KEYS = [
+  "ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor",
+  "notebook",
+  ...MACBOOK_YEAR_KEYS,
+  "mouse_keyboard", "audio", "peripheral", "other",
+];
+
+// กลุ่ม option สำหรับ dropdown เลือกหมวดหมู่ (MacBook พับเป็นกลุ่มย่อยแบบเลื่อนลง)
+const CATEGORY_GROUPS = {
+  th: [
+    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
+    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+  ],
+  en: [
+    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
+    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+  ],
+  zh: [
+    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
+    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+  ],
 };
+
+const CATEGORY_LABELS = {
+  th: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "เมนบอร์ด", gpu: "การ์ดจอ", psu: "เพาเวอร์ซัพพลาย", case: "เคสคอมพิวเตอร์", monitor: "จอมอนิเตอร์", notebook: "โน้ตบุ๊ก", mouse_keyboard: "เมาส์ คีย์บอร์ด & แผ่นรองเมาส์", audio: "หูฟัง & ลำโพง", peripheral: "อุปกรณ์ต่อพ่วง", other: "อื่นๆ" },
+  en: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "Motherboard", gpu: "Graphics Card", psu: "Power Supply", case: "Computer Case", monitor: "Monitor", notebook: "Notebook", mouse_keyboard: "Mouse, Keyboard & Mousepad", audio: "Headphones & Speakers", peripheral: "Peripherals", other: "Other" },
+  zh: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "主板", gpu: "显卡", psu: "电源", case: "机箱", monitor: "显示器", notebook: "笔记本电脑", mouse_keyboard: "鼠标、键盘 & 鼠标垫", audio: "耳机 & 音箱", peripheral: "外围设备", other: "其他" },
+};
+// ป้ายชื่อรุ่นปีของ MacBook (เหมือนกันทุกภาษา ใช้ตัวเลขปี)
+MACBOOK_YEAR_KEYS.forEach((key) => {
+  const year = key.replace("macbook_", "");
+  CATEGORY_LABELS.th[key] = `MacBook (${year})`;
+  CATEGORY_LABELS.en[key] = `MacBook (${year})`;
+  CATEGORY_LABELS.zh[key] = `MacBook (${year})`;
+});
 // รองรับสินค้าเดิมที่เคยบันทึกหมวดหมู่เป็นข้อความภาษาไทยไว้ก่อนเปลี่ยนมาใช้ key
 const LEGACY_CATEGORY_MAP = {
   "RAM": "ram", "SSD": "ssd", "HDD": "hdd", "CPU": "cpu",
   "เมนบอร์ด": "motherboard", "การ์ดจอ": "gpu", "เพาเวอร์ซัพพลาย": "psu",
   "เคสคอมพิวเตอร์": "case", "จอมอนิเตอร์": "monitor", "อุปกรณ์ต่อพ่วง": "peripheral", "อื่นๆ": "other",
+  // เดิมเคยแยก "แบตเตอรี่ & แผ่นรองเมาส์" เป็นหมวดของตัวเอง ตอนนี้รวมเข้ากับเมาส์/คีย์บอร์ดแล้ว
+  "mousepad_battery": "mouse_keyboard",
 };
 function normalizeCategoryKey(cat) {
   if (!cat) return "";
@@ -304,18 +347,117 @@ let pendingFiles = [];     // ไฟล์ใหม่ที่เพิ่ง�
 let currentCategoryFilter = "";
 let currentSort = "newest";
 
-// ------------------- ตั้งค่าตัวเลือกหมวดหมู่ -------------------
+// ------------------- Custom dropdown หมวดหมู่ (MacBook พับเป็น accordion เลื่อนลง) -------------------
+// selectEl ยังคงเก็บค่าจริงไว้เหมือนเดิม (ใช้ .value ที่อื่นในโค้ดได้ตามปกติ) แค่ซ่อนไว้และคุมด้วย custom UI ด้านบน
+function setupCategoryDropdown({ selectEl, toggleEl, menuEl, isFilter }) {
+  function labelFor(value) {
+    if (!value) return translations[currentLang].allCategories;
+    const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
+    return labels[normalizeCategoryKey(value)] || value;
+  }
+
+  function syncToggleText() {
+    toggleEl.textContent = labelFor(selectEl.value);
+  }
+
+  function closeMenu() {
+    menuEl.classList.add("d-none");
+  }
+
+  function render() {
+    const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
+    const groups = CATEGORY_GROUPS[currentLang] || CATEGORY_GROUPS.th;
+    let html = "";
+    if (isFilter) {
+      html += `<button type="button" class="category-item" data-value="">${translations[currentLang].allCategories}</button>`;
+    }
+    groups.forEach((group, gi) => {
+      if (group.label) {
+        const subId = `${menuEl.id}-group-${gi}`;
+        html += `
+          <div class="category-group">
+            <button type="button" class="category-item category-group-toggle" data-collapse-target="${subId}">
+              <span>${group.label}</span><i class="bi bi-chevron-down category-chevron"></i>
+            </button>
+            <div class="category-submenu collapse" id="${subId}">
+              ${group.keys.map((k) => `<button type="button" class="category-item category-subitem" data-value="${k}">${labels[k]}</button>`).join("")}
+            </div>
+          </div>`;
+      } else {
+        html += group.keys.map((k) => `<button type="button" class="category-item" data-value="${k}">${labels[k]}</button>`).join("");
+      }
+    });
+    menuEl.innerHTML = html;
+
+    // ยังคงเติม <option> ในตัว select ที่ซ่อนไว้ เพราะ .value ของ select จะเซ็ตได้ก็ต่อเมื่อมี option ตรงกันอยู่จริง
+    const optionsHtml = groups.map((g) => g.keys.map((k) => `<option value="${k}">${labels[k]}</option>`).join("")).join("");
+    selectEl.innerHTML = isFilter ? `<option value="">${translations[currentLang].allCategories}</option>${optionsHtml}` : optionsHtml;
+
+    // เปิด/ปิดกลุ่ม MacBook แบบสไลด์ (ใช้ Bootstrap Collapse ที่โหลดมาอยู่แล้ว)
+    menuEl.querySelectorAll(".category-group-toggle").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const targetEl = document.getElementById(btn.getAttribute("data-collapse-target"));
+        const collapseInstance = bootstrap.Collapse.getOrCreateInstance(targetEl, { toggle: false });
+        collapseInstance.toggle();
+        btn.classList.toggle("open");
+      });
+    });
+
+    // เลือกหมวดหมู่
+    menuEl.querySelectorAll(".category-item[data-value]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectEl.value = btn.getAttribute("data-value");
+        syncToggleText();
+        closeMenu();
+        selectEl.dispatchEvent(new Event("change"));
+      });
+    });
+  }
+
+  toggleEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menuEl.classList.toggle("d-none");
+  });
+  menuEl.addEventListener("click", (e) => e.stopPropagation());
+  document.addEventListener("click", closeMenu);
+
+  render();
+  syncToggleText();
+
+  return { render, syncToggleText };
+}
+
+const productCategoryToggle = document.getElementById("productCategoryToggle");
+const productCategoryMenu = document.getElementById("productCategoryMenu");
+const categoryFilterToggle = document.getElementById("categoryFilterToggle");
+const categoryFilterMenu = document.getElementById("categoryFilterMenu");
+
+const productCategoryDropdownCtl = setupCategoryDropdown({
+  selectEl: productCategorySelect, toggleEl: productCategoryToggle, menuEl: productCategoryMenu, isFilter: false,
+});
+const categoryFilterDropdownCtl = setupCategoryDropdown({
+  selectEl: categoryFilterEl, toggleEl: categoryFilterToggle, menuEl: categoryFilterMenu, isFilter: true,
+});
+
+// เปลี่ยนค่าหมวดหมู่จากโค้ด (เช่น ตอนรีเซ็ตฟอร์ม/แก้ไขสินค้า) แล้วให้ปุ่ม toggle อัปเดตข้อความตามด้วย
+function setProductCategoryValue(value) {
+  productCategorySelect.value = value;
+  productCategoryDropdownCtl.syncToggleText();
+}
+
 function populateCategoryOptions() {
-  const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
   const prevProductCat = productCategorySelect.value;
   const prevFilterCat = categoryFilterEl.value;
 
-  productCategorySelect.innerHTML = CATEGORY_KEYS.map((k) => `<option value="${k}">${labels[k]}</option>`).join("");
-  categoryFilterEl.innerHTML = `<option value="">${translations[currentLang].allCategories}</option>` +
-    CATEGORY_KEYS.map((k) => `<option value="${k}">${labels[k]}</option>`).join("");
+  productCategoryDropdownCtl.render();
+  categoryFilterDropdownCtl.render();
 
   if (CATEGORY_KEYS.includes(prevProductCat)) productCategorySelect.value = prevProductCat;
   if (CATEGORY_KEYS.includes(prevFilterCat)) categoryFilterEl.value = prevFilterCat;
+  productCategoryDropdownCtl.syncToggleText();
+  categoryFilterDropdownCtl.syncToggleText();
 }
 populateCategoryOptions();
 
@@ -944,7 +1086,7 @@ function resetProductForm() {
   pendingFiles = [];
   addProductForm.reset();
   renderImagePreviews();
-  productCategorySelect.value = CATEGORY_KEYS[0];
+  setProductCategoryValue(CATEGORY_KEYS[0]);
   productQtyInput.value = 1;
   formPageTitleText.textContent = translations[currentLang].modalTitle;
   formPageTitleIcon.className = "bi bi-plus-circle";
@@ -961,7 +1103,7 @@ function fillProductForm(product) {
   document.getElementById("productName").value = product.name || "";
   document.getElementById("productDesc").value = product.description || "";
   document.getElementById("productPrice").value = product.price ?? "";
-  productCategorySelect.value = normalizeCategoryKey(product.category) || CATEGORY_KEYS[CATEGORY_KEYS.length - 1];
+  setProductCategoryValue(normalizeCategoryKey(product.category) || CATEGORY_KEYS[CATEGORY_KEYS.length - 1]);
   productQtyInput.value = product.quantity ?? 1;
   renderImagePreviews();
 
@@ -1061,7 +1203,7 @@ addProductForm.addEventListener("submit", async (e) => {
     existingImages = [];
     pendingFiles = [];
     addProductForm.reset();
-    productCategorySelect.value = CATEGORY_KEYS[0];
+    setProductCategoryValue(CATEGORY_KEYS[0]);
     productQtyInput.value = 1;
     renderImagePreviews();
     await fetchProducts();
