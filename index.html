@@ -55,7 +55,11 @@
       <h5 id="sectionTitle" class="section-title mb-0"><i class="bi bi-box-seam"></i> รายการสินค้าอุปกรณ์คอมพิวเตอร์</h5>
       <div class="d-flex flex-column flex-sm-row gap-2 w-100" style="max-width: 720px;">
         <input id="searchInput" type="search" class="form-control" placeholder="ค้นหาสินค้า... เช่น RAM, SSD, CPU">
-        <select id="categoryFilter" class="form-select" style="max-width: 180px;">
+        <div class="category-dropdown" id="categoryFilterDropdown" style="max-width: 220px; width: 100%;">
+          <button type="button" class="form-select category-dropdown-toggle" id="categoryFilterToggle">ทุกหมวดหมู่</button>
+          <div class="category-dropdown-menu d-none" id="categoryFilterMenu"></div>
+        </div>
+        <select id="categoryFilter" class="d-none">
           <option value="">ทุกหมวดหมู่</option>
         </select>
         <select id="sortSelect" class="form-select" style="max-width: 190px;">
@@ -110,7 +114,11 @@
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label id="labelProductCategory" class="form-label fw-semibold">หมวดหมู่</label>
-            <select class="form-select" id="productCategory"></select>
+            <div class="category-dropdown" id="productCategoryDropdown">
+              <button type="button" class="form-select category-dropdown-toggle" id="productCategoryToggle">เลือกหมวดหมู่</button>
+              <div class="category-dropdown-menu d-none" id="productCategoryMenu"></div>
+            </div>
+            <select class="form-select d-none" id="productCategory"></select>
           </div>
           <div class="col-md-6">
             <label id="labelProductQty" class="form-label fw-semibold">จำนวนคงเหลือ</label>
