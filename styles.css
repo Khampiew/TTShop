@@ -794,3 +794,89 @@
       margin: 1.75rem auto;
     }
   }
+
+/* ------------------- Custom Category Dropdown (พร้อม MacBook accordion แบบสไลด์ลง) ------------------- */
+.category-dropdown {
+  position: relative;
+}
+.category-dropdown-toggle {
+  width: 100%;
+  text-align: left;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.category-dropdown-toggle::after {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 8px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6c757d;
+  flex-shrink: 0;
+}
+.category-dropdown-menu {
+  position: absolute;
+  z-index: 1050;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #D6DEEA;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(10,54,157,0.14);
+  padding: 6px;
+}
+.category-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1c2b4a;
+  cursor: pointer;
+}
+.category-item:hover {
+  background-color: #EEF3FC;
+}
+.category-item.active {
+  background-color: rgba(13,110,253,0.12);
+  color: var(--navy);
+  font-weight: 600;
+}
+.category-group {
+  border-top: 1px solid #EEF1F6;
+  border-bottom: 1px solid #EEF1F6;
+  margin: 4px 0;
+  padding: 2px 0;
+}
+.category-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--navy);
+}
+.category-chevron {
+  transition: transform .2s var(--ease);
+  font-size: 0.85rem;
+}
+.category-group-toggle.open .category-chevron {
+  transform: rotate(180deg);
+}
+.category-submenu {
+  padding-left: 10px;
+}
+.category-subitem {
+  font-size: 0.9rem;
+  color: #3a4a6b;
+}
