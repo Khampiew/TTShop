@@ -20,36 +20,46 @@ for (let y = MACBOOK_YEAR_END; y >= MACBOOK_YEAR_START; y--) {
   MACBOOK_YEAR_KEYS.push(`macbook_${y}`);
 }
 
-const CATEGORY_KEYS = [
+// กลุ่ม "ส่วนประกอบคอมพิวเตอร์" ที่จะถูกยุบรวมเป็นปุ่มเดียวในแถบหมวดหมู่ด่วน (storefront quick-nav)
+// หมายเหตุ: "คอม All In One" และ "คอมชุด" แยกออกมาเป็นหมวดเดี่ยวข้างนอก ไม่รวมอยู่ในกลุ่มนี้ตามที่แจ้ง
+const COMPONENT_CATEGORY_KEYS = [
   "ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor",
-  "notebook",
-  ...MACBOOK_YEAR_KEYS,
-  "mouse_keyboard", "audio", "peripheral", "other",
 ];
 
-// กลุ่ม option สำหรับ dropdown เลือกหมวดหมู่ (MacBook พับเป็นกลุ่มย่อยแบบเลื่อนลง)
+const CATEGORY_KEYS = [
+  ...COMPONENT_CATEGORY_KEYS,
+  "all_in_one", "comset", "notebook",
+  ...MACBOOK_YEAR_KEYS,
+  "mouse", "keyboard", "mousepad", "audio", "peripheral", "other",
+];
+
+// กลุ่ม option สำหรับ dropdown เลือกหมวดหมู่ (ส่วนประกอบคอม + MacBook พับเป็นกลุ่มย่อยแบบเลื่อนลง)
+// "คอม All In One" และ "คอมชุด" อยู่นอกกลุ่มส่วนประกอบ เป็นหมวดเดี่ยวเหมือน notebook
 const CATEGORY_GROUPS = {
   th: [
-    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "ส่วนประกอบคอมพิวเตอร์", keys: COMPONENT_CATEGORY_KEYS },
+    { label: null, keys: ["all_in_one", "comset", "notebook"] },
     { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
-    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+    { label: null, keys: ["mouse", "keyboard", "mousepad", "audio", "peripheral", "other"] },
   ],
   en: [
-    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "Computer Components", keys: COMPONENT_CATEGORY_KEYS },
+    { label: null, keys: ["all_in_one", "comset", "notebook"] },
     { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
-    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+    { label: null, keys: ["mouse", "keyboard", "mousepad", "audio", "peripheral", "other"] },
   ],
   zh: [
-    { label: null, keys: ["ram", "ssd", "hdd", "cpu", "motherboard", "gpu", "psu", "case", "monitor", "notebook"] },
+    { label: "电脑配件", keys: COMPONENT_CATEGORY_KEYS },
+    { label: null, keys: ["all_in_one", "comset", "notebook"] },
     { label: "MacBook", keys: MACBOOK_YEAR_KEYS },
-    { label: null, keys: ["mouse_keyboard", "audio", "peripheral", "other"] },
+    { label: null, keys: ["mouse", "keyboard", "mousepad", "audio", "peripheral", "other"] },
   ],
 };
 
 const CATEGORY_LABELS = {
-  th: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "เมนบอร์ด", gpu: "การ์ดจอ", psu: "เพาเวอร์ซัพพลาย", case: "เคสคอมพิวเตอร์", monitor: "จอมอนิเตอร์", notebook: "โน้ตบุ๊ก", mouse_keyboard: "เมาส์ คีย์บอร์ด & แผ่นรองเมาส์", audio: "หูฟัง & ลำโพง", peripheral: "อุปกรณ์ต่อพ่วง", other: "อื่นๆ" },
-  en: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "Motherboard", gpu: "Graphics Card", psu: "Power Supply", case: "Computer Case", monitor: "Monitor", notebook: "Notebook", mouse_keyboard: "Mouse, Keyboard & Mousepad", audio: "Headphones & Speakers", peripheral: "Peripherals", other: "Other" },
-  zh: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "主板", gpu: "显卡", psu: "电源", case: "机箱", monitor: "显示器", notebook: "笔记本电脑", mouse_keyboard: "鼠标、键盘 & 鼠标垫", audio: "耳机 & 音箱", peripheral: "外围设备", other: "其他" },
+  th: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "เมนบอร์ด", gpu: "การ์ดจอ", psu: "เพาเวอร์ซัพพลาย", case: "เคสคอมพิวเตอร์", monitor: "จอมอนิเตอร์", all_in_one: "คอมพิวเตอร์ All In One", comset: "คอมชุด (จัดสเปค)", notebook: "โน้ตบุ๊ก", mouse: "เมาส์", keyboard: "คีย์บอร์ด", mousepad: "แผ่นรองเมาส์", audio: "หูฟัง & ลำโพง", peripheral: "อุปกรณ์ต่อพ่วง", other: "อื่นๆ" },
+  en: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "Motherboard", gpu: "Graphics Card", psu: "Power Supply", case: "Computer Case", monitor: "Monitor", all_in_one: "All-in-One PC", comset: "PC Bundle Set", notebook: "Notebook", mouse: "Mouse", keyboard: "Keyboard", mousepad: "Mouse Pad", audio: "Headphones & Speakers", peripheral: "Peripherals", other: "Other" },
+  zh: { ram: "RAM", ssd: "SSD", hdd: "HDD", cpu: "CPU", motherboard: "主板", gpu: "显卡", psu: "电源", case: "机箱", monitor: "显示器", all_in_one: "一体机", comset: "组装套装", notebook: "笔记本电脑", mouse: "鼠标", keyboard: "键盘", mousepad: "鼠标垫", audio: "耳机 & 音箱", peripheral: "外围设备", other: "其他" },
 };
 // ป้ายชื่อรุ่นปีของ MacBook (เหมือนกันทุกภาษา ใช้ตัวเลขปี)
 MACBOOK_YEAR_KEYS.forEach((key) => {
@@ -63,8 +73,11 @@ const LEGACY_CATEGORY_MAP = {
   "RAM": "ram", "SSD": "ssd", "HDD": "hdd", "CPU": "cpu",
   "เมนบอร์ด": "motherboard", "การ์ดจอ": "gpu", "เพาเวอร์ซัพพลาย": "psu",
   "เคสคอมพิวเตอร์": "case", "จอมอนิเตอร์": "monitor", "อุปกรณ์ต่อพ่วง": "peripheral", "อื่นๆ": "other",
-  // เดิมเคยแยก "แบตเตอรี่ & แผ่นรองเมาส์" เป็นหมวดของตัวเอง ตอนนี้รวมเข้ากับเมาส์/คีย์บอร์ดแล้ว
-  "mousepad_battery": "mouse_keyboard",
+  // เดิมเคยแยก "แบตเตอรี่ & แผ่นรองเมาส์" เป็นหมวดของตัวเอง ตอนนี้แยกเป็นเมาส์/คีย์บอร์ด/แผ่นรองเมาส์แล้ว
+  "mousepad_battery": "mouse",
+  // เดิมรวม "เมาส์ คีย์บอร์ด & แผ่นรองเมาส์" ไว้หมวดเดียว ตอนนี้แยกเป็น 3 หมวดย่อย
+  // (สินค้าเก่าจะถูกจัดเข้าเมาส์ไปก่อน ผู้ใช้แก้ไขภายหลังได้ตามจริง)
+  "mouse_keyboard": "mouse",
 };
 function normalizeCategoryKey(cat) {
   if (!cat) return "";
@@ -124,6 +137,7 @@ const translations = {
     statValueLabel: "มูลค่าสต๊อกรวม",
     statLowLabel: "สินค้าใกล้หมด",
     allCategories: "ทุกหมวดหมู่",
+    categorySidebarTitle: "หมวดหมู่สินค้า",
     stockButton: "สต๊อกสินค้า",
     stockModalTitle: "สรุปข้อมูลสต๊อกสินค้า",
     viewEditButton: "แก้ไข",
@@ -136,6 +150,13 @@ const translations = {
     deleteButton: "ลบ",
     backButton: "กลับ",
     notFoundText: "ไม่พบสินค้านี้ อาจถูกลบไปแล้ว",
+    topBarTagline: "ตัวแทนจำหน่ายอุปกรณ์คอมพิวเตอร์ครบวงจร",
+    heroEyebrow1: "CompStock Manager", heroTitle1: "จัดการสต๊อกสินค้าคอมพิวเตอร์ ง่ายในที่เดียว", heroDesc1: "เพิ่ม แก้ไข และติดตามสินค้าอุปกรณ์คอมพิวเตอร์ทั้งหมดของคุณแบบเรียลไทม์",
+    heroEyebrow2: "สต๊อกเรียลไทม์", heroTitle2: "รู้ทันสินค้าใกล้หมดก่อนใคร", heroDesc2: "ระบบแจ้งเตือนสินค้าใกล้หมดสต๊อก พร้อมสรุปมูลค่าสินค้าคงเหลือทั้งหมด",
+    heroEyebrow3: "รูปภาพหลายรูป", heroTitle3: "ถ่ายภาพหรืออัปโหลดได้จากมือถือ", heroDesc3: "แนบรูปสินค้าได้หลายรูปต่อรายการ พร้อมย่อขนาดไฟล์อัตโนมัติ",
+    footerDesc: "ระบบจัดการสต๊อกสินค้าอุปกรณ์คอมพิวเตอร์ ใช้งานง่าย รองรับหลายภาษา",
+    footerContactTitle: "ติดต่อเรา", footerFollowTitle: "ติดตามเรา", footerAddress: "เวียงจันทน์, สปป.ลาว",
+    footerBottom: "© 2026 CompStock Manager. สงวนลิขสิทธิ์.",
   },
   en: {
     pageTitle: "CompStock Manager - Product Inventory",
@@ -179,6 +200,7 @@ const translations = {
     statValueLabel: "Total stock value",
     statLowLabel: "Low stock",
     allCategories: "All categories",
+    categorySidebarTitle: "Product Categories",
     stockButton: "Stock Summary",
     stockModalTitle: "Stock Summary",
     viewEditButton: "Edit",
@@ -191,6 +213,13 @@ const translations = {
     deleteButton: "Delete",
     backButton: "Back",
     notFoundText: "Product not found. It may have been deleted.",
+    topBarTagline: "Your one-stop computer parts supplier",
+    heroEyebrow1: "CompStock Manager", heroTitle1: "Manage your computer inventory in one place", heroDesc1: "Add, edit, and track all your computer hardware in real time",
+    heroEyebrow2: "Real-time stock", heroTitle2: "Stay ahead of low stock", heroDesc2: "Get notified when items run low, with a full summary of your stock value",
+    heroEyebrow3: "Multiple photos", heroTitle3: "Snap or upload photos from your phone", heroDesc3: "Attach multiple photos per product, automatically compressed",
+    footerDesc: "An easy-to-use, multilingual computer parts inventory system.",
+    footerContactTitle: "Contact Us", footerFollowTitle: "Follow Us", footerAddress: "Vientiane, Laos",
+    footerBottom: "© 2026 CompStock Manager. All rights reserved.",
   },
   zh: {
     pageTitle: "CompStock Manager - 产品库存",
@@ -234,6 +263,7 @@ const translations = {
     statValueLabel: "库存总价值",
     statLowLabel: "库存不足",
     allCategories: "所有分类",
+    categorySidebarTitle: "商品分类",
     stockButton: "库存汇总",
     stockModalTitle: "库存汇总",
     viewEditButton: "编辑",
@@ -246,6 +276,13 @@ const translations = {
     deleteButton: "删除",
     backButton: "返回",
     notFoundText: "未找到该商品，可能已被删除",
+    topBarTagline: "一站式电脑配件供应商",
+    heroEyebrow1: "CompStock Manager", heroTitle1: "一站式管理您的电脑库存", heroDesc1: "实时添加、编辑和跟踪您的所有电脑配件",
+    heroEyebrow2: "实时库存", heroTitle2: "提前掌握库存不足商品", heroDesc2: "库存不足自动提醒，并汇总库存总价值",
+    heroEyebrow3: "多张图片", heroTitle3: "手机拍照或上传图片", heroDesc3: "每件商品可添加多张图片，并自动压缩",
+    footerDesc: "简单易用、支持多语言的电脑配件库存管理系统。",
+    footerContactTitle: "联系我们", footerFollowTitle: "关注我们", footerAddress: "老挝万象",
+    footerBottom: "© 2026 CompStock Manager. 保留所有权利。",
   },
 };
 
@@ -447,6 +484,235 @@ function setProductCategoryValue(value) {
   productCategoryDropdownCtl.syncToggleText();
 }
 
+// ------------------- Category quick-nav pills (storefront style, in navbar) -------------------
+// รายการหมวดหมู่ "ส่วนประกอบคอมพิวเตอร์" ถูกยุบรวมเป็นปุ่มเดียว กดแล้วมีเมนูย่อยให้เลือก
+// เช่นเดียวกับ MacBook ที่พับเป็นปุ่มเดียวแล้วกดเลือกรุ่นปีย่อยได้ ช่วยให้แถบหมวดหมู่ไม่ยาวเกินไปบนมือถือ/iPad
+const QUICK_NAV_ITEMS = [
+  { type: "group", id: "components", icon: "bi-cpu-fill", labelKey: "componentsGroup", keys: COMPONENT_CATEGORY_KEYS },
+  { type: "single", key: "all_in_one" },
+  { type: "single", key: "comset" },
+  { type: "single", key: "notebook" },
+  { type: "group", id: "macbook", icon: "bi-apple", labelKey: "macbookGroup", keys: MACBOOK_YEAR_KEYS },
+  { type: "single", key: "mouse" },
+  { type: "single", key: "keyboard" },
+  { type: "single", key: "mousepad" },
+  { type: "single", key: "audio" },
+  { type: "single", key: "peripheral" },
+  { type: "single", key: "other" },
+];
+const QUICK_NAV_GROUP_LABELS = {
+  th: { componentsGroup: "ส่วนประกอบคอมพิวเตอร์", macbookGroup: "MacBook" },
+  en: { componentsGroup: "Computer Components", macbookGroup: "MacBook" },
+  zh: { componentsGroup: "电脑配件", macbookGroup: "MacBook" },
+};
+const CATEGORY_ICONS = {
+  ram: "bi-memory", ssd: "bi-device-ssd", hdd: "bi-hdd", cpu: "bi-cpu",
+  motherboard: "bi-motherboard", gpu: "bi-gpu-card", psu: "bi-plug-fill",
+  case: "bi-pc-display-horizontal", monitor: "bi-display", all_in_one: "bi-pc-display",
+  comset: "bi-boxes", notebook: "bi-laptop",
+  mouse: "bi-mouse2-fill", keyboard: "bi-keyboard-fill", mousepad: "bi-square",
+  audio: "bi-headphones", peripheral: "bi-usb-plug", other: "bi-three-dots",
+};
+
+let openQuickNavGroupId = null;
+
+function closeQuickNavSubmenu() {
+  openQuickNavGroupId = null;
+  const panel = document.getElementById("quickNavSubmenuPanel");
+  if (panel) panel.classList.add("d-none");
+  document.querySelectorAll(".quick-nav-pill.open").forEach((b) => b.classList.remove("open"));
+}
+
+function positionQuickNavSubmenu(panel, anchorBtn) {
+  panel.style.visibility = "hidden";
+  panel.classList.remove("d-none");
+  const anchorRect = anchorBtn.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const margin = 8;
+  let left = anchorRect.left;
+  const maxLeft = window.innerWidth - panelRect.width - margin;
+  left = Math.max(margin, Math.min(left, maxLeft));
+  let top = anchorRect.bottom + margin;
+  const maxTop = window.innerHeight - panelRect.height - margin;
+  if (top > maxTop && anchorRect.top - panelRect.height - margin > margin) {
+    top = anchorRect.top - panelRect.height - margin; // ถ้าล้นด้านล่างจอ ให้เปิดขึ้นด้านบนปุ่มแทน
+  }
+  panel.style.left = `${left}px`;
+  panel.style.top = `${Math.max(margin, top)}px`;
+  panel.style.visibility = "visible";
+}
+
+function openQuickNavSubmenu(item, anchorBtn) {
+  const panel = document.getElementById("quickNavSubmenuPanel");
+  if (!panel) return;
+  const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
+  openQuickNavGroupId = item.id;
+  document.querySelectorAll(".quick-nav-pill.open").forEach((b) => b.classList.remove("open"));
+  anchorBtn.classList.add("open");
+
+  panel.innerHTML = item.keys.map((k) => `
+    <button type="button" class="quick-nav-submenu-item${currentCategoryFilter === k ? " active" : ""}" data-value="${k}">
+      <i class="bi ${CATEGORY_ICONS[k] || "bi-tag"}"></i><span>${labels[k]}</span>
+    </button>`).join("");
+
+  panel.querySelectorAll(".quick-nav-submenu-item").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const value = btn.getAttribute("data-value");
+      currentCategoryFilter = value;
+      categoryFilterEl.value = value;
+      categoryFilterDropdownCtl.syncToggleText();
+      applyProductFilter();
+      closeQuickNavSubmenu();
+      renderCategoryQuickNav();
+      document.getElementById("productGridSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  requestAnimationFrame(() => positionQuickNavSubmenu(panel, anchorBtn));
+}
+
+function renderCategoryQuickNav() {
+  const wrap = document.getElementById("categoryQuickNav");
+  if (!wrap) return;
+  const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
+  const groupLabels = QUICK_NAV_GROUP_LABELS[currentLang] || QUICK_NAV_GROUP_LABELS.th;
+
+  let html = `<button type="button" class="quick-nav-pill${!currentCategoryFilter ? " active" : ""}" data-value="">
+      <i class="bi bi-grid-3x3-gap-fill"></i><span>${translations[currentLang].allCategories}</span>
+    </button>`;
+
+  QUICK_NAV_ITEMS.forEach((item) => {
+    if (item.type === "single") {
+      const k = item.key;
+      html += `<button type="button" class="quick-nav-pill${currentCategoryFilter === k ? " active" : ""}" data-value="${k}">
+        <i class="bi ${CATEGORY_ICONS[k] || "bi-tag"}"></i><span>${labels[k]}</span>
+      </button>`;
+    } else {
+      const isActiveGroup = item.keys.includes(currentCategoryFilter);
+      const pillLabel = isActiveGroup ? (labels[currentCategoryFilter] || groupLabels[item.labelKey]) : groupLabels[item.labelKey];
+      html += `<button type="button" class="quick-nav-pill quick-nav-pill-group${isActiveGroup ? " active" : ""}" data-group-id="${item.id}">
+        <i class="bi ${item.icon}"></i><span>${pillLabel}</span><i class="bi bi-chevron-down quick-nav-caret"></i>
+      </button>`;
+    }
+  });
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll(".quick-nav-pill[data-value]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      closeQuickNavSubmenu();
+      const value = btn.getAttribute("data-value");
+      currentCategoryFilter = value;
+      categoryFilterEl.value = value;
+      categoryFilterDropdownCtl.syncToggleText();
+      applyProductFilter();
+      renderCategoryQuickNav();
+      document.getElementById("productGridSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  wrap.querySelectorAll(".quick-nav-pill-group").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const groupId = btn.getAttribute("data-group-id");
+      const item = QUICK_NAV_ITEMS.find((it) => it.type === "group" && it.id === groupId);
+      if (openQuickNavGroupId === groupId) {
+        closeQuickNavSubmenu();
+      } else if (item) {
+        openQuickNavSubmenu(item, btn);
+      }
+    });
+  });
+}
+
+// ------------------- Category sidebar (แถบด้านซ้าย แสดงหมวดหมู่สินค้าแบบละเอียด พร้อมจำนวนสินค้าต่อหมวด) -------------------
+let sidebarOpenGroupIds = new Set(); // ปิดทุกกลุ่มไว้เป็นค่าเริ่มต้นตอนโหลด/รีเซ็ตหน้าเว็บ ผู้ใช้กดเปิดเองทีหลัง
+
+function countByCategoryKeys(keys) {
+  return allProducts.filter((p) => keys.includes(normalizeCategoryKey(p.category || ""))).length;
+}
+
+function renderCategorySidebar() {
+  const body = document.getElementById("categorySidebarBody");
+  if (!body) return;
+  const labels = CATEGORY_LABELS[currentLang] || CATEGORY_LABELS.th;
+  const groupLabels = QUICK_NAV_GROUP_LABELS[currentLang] || QUICK_NAV_GROUP_LABELS.th;
+
+  let html = `<button type="button" class="category-sidebar-item${!currentCategoryFilter ? " active" : ""}" data-value="">
+      <span><i class="bi bi-grid-3x3-gap-fill"></i>${translations[currentLang].allCategories}</span>
+      <span class="category-sidebar-count">${allProducts.length}</span>
+    </button>`;
+
+  QUICK_NAV_ITEMS.forEach((item) => {
+    if (item.type === "single") {
+      const k = item.key;
+      html += `<button type="button" class="category-sidebar-item${currentCategoryFilter === k ? " active" : ""}" data-value="${k}">
+        <span><i class="bi ${CATEGORY_ICONS[k] || "bi-tag"}"></i>${labels[k]}</span>
+        <span class="category-sidebar-count">${countByCategoryKeys([k])}</span>
+      </button>`;
+    } else {
+      const isOpen = sidebarOpenGroupIds.has(item.id);
+      const isActiveGroup = item.keys.includes(currentCategoryFilter);
+      html += `
+        <div class="category-sidebar-group">
+          <button type="button" class="category-sidebar-item category-sidebar-group-toggle${isActiveGroup ? " active" : ""}" data-sidebar-group="${item.id}">
+            <span><i class="bi ${item.icon}"></i>${groupLabels[item.labelKey]}</span>
+            <span class="category-sidebar-count">${countByCategoryKeys(item.keys)}<i class="bi bi-chevron-down category-chevron${isOpen ? " open-rotate" : ""}"></i></span>
+          </button>
+          <div class="category-sidebar-submenu${isOpen ? "" : " d-none"}" id="sidebarGroup-${item.id}">
+            ${item.keys.map((k) => `
+              <button type="button" class="category-sidebar-item category-sidebar-subitem${currentCategoryFilter === k ? " active" : ""}" data-value="${k}">
+                <span><i class="bi ${CATEGORY_ICONS[k] || "bi-tag"}"></i>${labels[k]}</span>
+                <span class="category-sidebar-count">${countByCategoryKeys([k])}</span>
+              </button>`).join("")}
+          </div>
+        </div>`;
+    }
+  });
+  body.innerHTML = html;
+
+  body.querySelectorAll(".category-sidebar-item[data-value]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const value = btn.getAttribute("data-value");
+      currentCategoryFilter = value;
+      categoryFilterEl.value = value;
+      categoryFilterDropdownCtl.syncToggleText();
+      applyProductFilter();
+      renderCategoryQuickNav();
+      document.getElementById("productGridSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  body.querySelectorAll(".category-sidebar-group-toggle").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const groupId = btn.getAttribute("data-sidebar-group");
+      if (sidebarOpenGroupIds.has(groupId)) sidebarOpenGroupIds.delete(groupId);
+      else sidebarOpenGroupIds.add(groupId);
+      renderCategorySidebar();
+    });
+  });
+}
+
+// ย่อ/ขยายแถบหมวดหมู่ด้านซ้ายทั้งแถบบนมือถือ/แท็บเล็ต (บนจอใหญ่แสดงตลอดอยู่แล้ว)
+const categorySidebarToggle = document.getElementById("categorySidebarToggle");
+const categorySidebarEl = document.getElementById("categorySidebar");
+categorySidebarToggle?.addEventListener("click", () => {
+  categorySidebarEl.classList.toggle("mobile-open");
+  categorySidebarToggle.classList.toggle("open");
+});
+
+// ปิดเมนูย่อยเมื่อคลิกที่อื่น เลื่อนหน้าเว็บ หรือย่อ/ขยายหน้าต่าง
+// หมายเหตุ: ใช้ listener แบบ bubble (ไม่ใช่ capture) บน window เพื่อจับเฉพาะ "การเลื่อนหน้าเว็บจริง" เท่านั้น
+// ถ้าใช้ capture:true มันจะไปจับ scroll event ของแถบหมวดหมู่ที่เลื่อนแนวนอนได้ (.category-nav-scroll) ด้วย
+// ทำให้เมนูปิดตัวเองทันทีหลังเปิด (แค่แตะปุ่มก็ทำให้แถบเลื่อนขยับเล็กน้อยแล้ว) นี่คือสาเหตุของบั๊ก "กดแล้วเมนูหาย"
+document.addEventListener("click", (e) => {
+  const panel = document.getElementById("quickNavSubmenuPanel");
+  if (panel && !panel.classList.contains("d-none") && !panel.contains(e.target)) closeQuickNavSubmenu();
+});
+window.addEventListener("scroll", () => closeQuickNavSubmenu());
+window.addEventListener("resize", () => closeQuickNavSubmenu());
+
 function populateCategoryOptions() {
   const prevProductCat = productCategorySelect.value;
   const prevFilterCat = categoryFilterEl.value;
@@ -460,10 +726,13 @@ function populateCategoryOptions() {
   categoryFilterDropdownCtl.syncToggleText();
 }
 populateCategoryOptions();
+renderCategoryQuickNav();
+renderCategorySidebar();
 
 categoryFilterEl.addEventListener("change", (e) => {
   currentCategoryFilter = e.target.value;
   applyProductFilter();
+  renderCategoryQuickNav();
 });
 
 sortSelectEl.addEventListener("change", (e) => {
@@ -513,6 +782,32 @@ function setLanguage(lang) {
   labelProductCategory.textContent = translations[lang].labelProductCategory;
   labelProductQty.textContent = translations[lang].labelProductQty;
   populateCategoryOptions();
+  renderCategoryQuickNav();
+  renderCategorySidebar();
+  const categorySidebarTitleEl = document.getElementById("categorySidebarTitle");
+  const categorySidebarToggleLabelEl = document.getElementById("categorySidebarToggleLabel");
+  if (categorySidebarTitleEl) categorySidebarTitleEl.textContent = translations[lang].categorySidebarTitle;
+  if (categorySidebarToggleLabelEl) categorySidebarToggleLabelEl.textContent = translations[lang].categorySidebarTitle;
+  const topBarTagline = document.getElementById("topBarTagline");
+  if (topBarTagline) topBarTagline.textContent = translations[lang].topBarTagline;
+  ["1", "2", "3"].forEach((n) => {
+    const eyebrow = document.getElementById(`heroEyebrow${n}`);
+    const title = document.getElementById(`heroTitle${n}`);
+    const desc = document.getElementById(`heroDesc${n}`);
+    if (eyebrow) eyebrow.textContent = translations[lang][`heroEyebrow${n}`];
+    if (title) title.textContent = translations[lang][`heroTitle${n}`];
+    if (desc) desc.textContent = translations[lang][`heroDesc${n}`];
+  });
+  const footerDesc = document.getElementById("footerDesc");
+  const footerContactTitle = document.getElementById("footerContactTitle");
+  const footerFollowTitle = document.getElementById("footerFollowTitle");
+  const footerAddress = document.getElementById("footerAddress");
+  const footerBottom = document.getElementById("footerBottom");
+  if (footerDesc) footerDesc.textContent = translations[lang].footerDesc;
+  if (footerContactTitle) footerContactTitle.textContent = translations[lang].footerContactTitle;
+  if (footerFollowTitle) footerFollowTitle.textContent = translations[lang].footerFollowTitle;
+  if (footerAddress) footerAddress.textContent = translations[lang].footerAddress;
+  if (footerBottom) footerBottom.textContent = translations[lang].footerBottom;
   const sortNewestOpt = document.querySelector('#sortSelect option[value="newest"]');
   const sortOldestOpt = document.querySelector('#sortSelect option[value="oldest"]');
   const sortPriceAscOpt = document.querySelector('#sortSelect option[value="price_asc"]');
@@ -837,6 +1132,7 @@ function applyProductFilter() {
   setProductCount(filtered.length);
   renderProducts(filtered);
   updateDashboardStats();
+  renderCategorySidebar();
 }
 
 function updateDashboardStats() {
